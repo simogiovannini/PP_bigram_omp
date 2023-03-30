@@ -31,7 +31,6 @@ string readInput(string path) {
 }
 
 map<string, int> computeNgrams(string data, int size, int start, int end) {
-    string ngram;
     int batch_size = end - start + 1;
     if (batch_size % size != 0) {
         int leftovers_size = batch_size - (batch_size / size) * size;
