@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <map>
 #include <omp.h>
+#include <chrono>
 
 using namespace std;
 
@@ -15,10 +16,22 @@ int main() {
     cout << "Corpus length: "  << corpus.length() << endl;
     int ngram_length = 2;
 
-    map<string, int> seq_ngrams = computeNgrams(corpus, ngram_length, 0, corpus.length() - 1);
-    cout << "Number of ngrams of size " << ngram_length << ": " << seq_ngrams.size() << endl;
 
+    auto beg = chrono::high_resolution_clock::now();
+    map<string, int> seq_ngrams = computeNgrams(corpus, ngram_length, 0, corpus.length() - 1);
+    auto end = chrono::high_resolution_clock::now();
+    auto duration = chrono::duration_cast<chrono::microseconds>(end - beg);
+
+    cout << "Number of ngrams of size " << ngram_length << ": " << seq_ngrams.size() << endl;
+    cout << "Sequential Elapsed Time: " << duration.count() << endl;
+
+    beg = chrono::high_resolution_clock::now();
     map<string, int> par_ngrams = computeParallelNgrams(corpus, ngram_length);
+    end = chrono::high_resolution_clock::now();
+    duration = chrono::duration_cast<chrono::microseconds>(end - beg);
+
+    cout << "Parallel Elapsed Time: " << duration.count() << endl;
+
     return 0;
 }
 
