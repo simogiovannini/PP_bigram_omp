@@ -8,7 +8,7 @@
 using namespace std;
 
 string readInput(string path);
-map<string, int> computeNgrams(string data, int ngram_length, int start, int end);
+map<string, int> computeSequentialNgrams(string data, int ngram_length, int start, int end);
 map<string, int> computeParallelNgrams(string data, int ngram_length);
 
 int main() {
@@ -17,7 +17,7 @@ int main() {
     int ngram_length = 2;
 
     auto beg = chrono::high_resolution_clock::now();
-    map<string, int> seq_ngrams = computeNgrams(corpus, ngram_length, 0, corpus.length() - 1);
+    map<string, int> seq_ngrams = computeSequentialNgrams(corpus, ngram_length, 0, corpus.length() - 1);
     auto end = chrono::high_resolution_clock::now();
     auto duration = chrono::duration_cast<chrono::microseconds>(end - beg);
 
@@ -46,7 +46,7 @@ string readInput(string path) {
     return data;
 }
 
-map<string, int> computeNgrams(string data, int ngram_length, int start, int end) {
+map<string, int> computeSequentialNgrams(string data, int ngram_length, int start, int end) {
     map<string, int> ngrams;
     for (int i = start; i <= end - ngram_length + 1; i++) {
         string ngram = data.substr(i, ngram_length);
