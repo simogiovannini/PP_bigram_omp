@@ -7,9 +7,9 @@
 
 using namespace std;
 
-string readInput(string path);
-map<string, int> computeSequentialNgrams(string data, int ngram_length, int start, int end);
-map<string, int> computeParallelNgrams(string data, int ngram_length);
+string readInput(const string& path);
+map<string, int> computeSequentialNgrams(const string& data, int ngram_length, int start, int end);
+map<string, int> computeParallelNgrams(const string& data, int ngram_length);
 
 int main() {
     string corpus = readInput("../corpus.txt");
@@ -35,7 +35,7 @@ int main() {
     return 0;
 }
 
-string readInput(string path) {
+string readInput(const string& path) {
     ifstream file(path);
     string str;
     string data;
@@ -46,7 +46,7 @@ string readInput(string path) {
     return data;
 }
 
-map<string, int> computeSequentialNgrams(string data, int ngram_length, int start, int end) {
+map<string, int> computeSequentialNgrams(const string& data, int ngram_length, int start, int end) {
     map<string, int> ngrams;
     for (int i = start; i <= end - ngram_length + 1; i++) {
         string ngram = data.substr(i, ngram_length);
@@ -55,7 +55,7 @@ map<string, int> computeSequentialNgrams(string data, int ngram_length, int star
     return ngrams;
 }
 
-map<string, int> computeParallelNgrams(string data, int ngram_length) {
+map<string, int> computeParallelNgrams(const string& data, int ngram_length) {
     map<string, int> ngrams;
     int n_threads = omp_get_max_threads();
 
