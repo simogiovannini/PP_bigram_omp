@@ -71,14 +71,11 @@ map<string, int> computeParallelNgrams(string data, int ngram_length) {
             end = data.length() - 1;
         }
 
-        map<string, int> local_ngrams;
-
         if(thread_id > 0) {
-            for(int i = start - ngram_length + 1; i < start; i++) {
-                string ngram = data.substr(i, ngram_length);
-                local_ngrams[ngram]++;
-            }
+            start = start - ngram_length + 1;
         }
+
+        map<string, int> local_ngrams;
 
         for (int i = start; i <= end - ngram_length + 1; i++) {
             string ngram = data.substr(i, ngram_length);
