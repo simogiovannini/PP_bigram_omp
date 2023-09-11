@@ -16,7 +16,6 @@ int main() {
     cout << "Corpus length: "  << corpus.length() << endl;
     int ngram_length = 2;
 
-
     auto beg = chrono::high_resolution_clock::now();
     map<string, int> seq_ngrams = computeNgrams(corpus, ngram_length, 0, corpus.length() - 1);
     auto end = chrono::high_resolution_clock::now();
@@ -30,6 +29,7 @@ int main() {
     end = chrono::high_resolution_clock::now();
     duration = chrono::duration_cast<chrono::microseconds>(end - beg);
 
+    cout << endl << "Number of ngrams of size " << ngram_length << ": " << par_ngrams.size() << endl;
     cout << "Parallel Elapsed Time: " << duration.count() << endl;
 
     return 0;
@@ -62,7 +62,7 @@ map<string, int> computeParallelNgrams(string data, int ngram_length) {
     int batch_size = data.length() / n_threads;
 
 
-#pragma omp parallel default(none) shared(ngram_length, batch_size, data)
+#pragma omp parallel default(none) shared(ngram_length, batch_size, data, ngrams)
     {
         int thread_id = omp_get_thread_num();
         int start = thread_id * batch_size;
@@ -72,7 +72,7 @@ map<string, int> computeParallelNgrams(string data, int ngram_length) {
 
         for (int i = start; i <= end - ngram_length + 1; i++) {
             string ngram = data.substr(i, ngram_length);
-            tmpNgrams[ngram]++;
+            ngrams[ngram]++;
         }
 
     }
