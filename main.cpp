@@ -23,11 +23,13 @@ int main() {
 
     int min_ngram_length = 2;
     int max_ngram_length = 8;
-    int n_attempts = 1;
+    int n_attempts = 10;
 
     vector<long long int> seq_times, par_times;
+    vector<int> ngram_lengths;
 
     for (int j = min_ngram_length; j <= max_ngram_length; j++) {
+        ngram_lengths.push_back(j);
         cout << endl << "Length: " << j << endl;
         beg = std::chrono::high_resolution_clock::now();
         for (int p = 0; p < n_attempts; p++) {
@@ -48,9 +50,16 @@ int main() {
         par_times.push_back(duration / n_attempts);
     }
 
+    plt::plot(ngram_lengths, seq_times);
+    plt::plot(ngram_lengths, par_times);
+    plt::title("Execution times [in milliseconds]");
+    plt::save("../fig1.png");
 
-    plt::plot(seq_times);
-    plt::save("../minimal.png");
+    cout << endl;
+
+    for(int i = 0; i < ngram_lengths.size(); i++) {
+        cout << "Speedup for ngram length " << ngram_lengths[i] << ": " << (double) ((double)seq_times[i] / (double)par_times[i]) << endl;
+    }
 
     return 0;
 }
