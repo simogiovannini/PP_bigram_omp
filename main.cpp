@@ -8,30 +8,43 @@
 using namespace std;
 
 string readInput(const string& path);
-map<string, int> computeSequentialNgrams(const string& data, int ngram_length, int start, int end);
-map<string, int> computeParallelNgrams(const string& data, int ngram_length);
+map<string, int> computeSequentialNgrams(string data, int ngram_length, int start, int end);
+map<string, int> computeParallelNgrams(string data, int ngram_length);
 
 int main() {
     string corpus = readInput("../corpus.txt");
     cout << "Corpus length: "  << corpus.length() << endl;
-    int ngram_length = 2;
 
-    auto beg = chrono::high_resolution_clock::now();
-    map<string, int> seq_ngrams = computeSequentialNgrams(corpus, ngram_length, 0, corpus.length() - 1);
-    auto end = chrono::high_resolution_clock::now();
-    auto duration = chrono::duration_cast<chrono::microseconds>(end - beg);
+    std::chrono::high_resolution_clock::time_point beg, end;
+    long long int duration;
 
-    cout << "Number of ngrams of size " << ngram_length << ": " << seq_ngrams.size() << endl;
-    cout << "Sequential Elapsed Time: " << duration.count() << endl;
+    int min_ngram_length = 2;
+    int max_ngram_length = 8;
+    int n_attempts = 10;
 
-    beg = chrono::high_resolution_clock::now();
-    map<string, int> par_ngrams = computeParallelNgrams(corpus, ngram_length);
-    end = chrono::high_resolution_clock::now();
-    duration = chrono::duration_cast<chrono::microseconds>(end - beg);
+    long long int seq_times[max_ngram_length - min_ngram_length + 1];
+    long long int par_times[max_ngram_length - min_ngram_length + 1];
 
-    cout << endl << "Number of ngrams of size " << ngram_length << ": " << par_ngrams.size() << endl;
-    cout << "Parallel Elapsed Time: " << duration.count() << endl;
+    for (int j = min_ngram_length; j <= max_ngram_length; j++) {
+        cout << endl << "Length: " << j << endl;
+        beg = std::chrono::high_resolution_clock::now();
+        for (int p = 0; p < n_attempts; p++) {
+            map<string, int> seq_ngrams = computeSequentialNgrams(corpus, j, 0, corpus.length() - 1);
+        }
+        end = std::chrono::high_resolution_clock::now();
+        duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - beg).count();
+        cout << "Seq time: " << duration / n_attempts << endl;
+        seq_times[j - min_ngram_length] = duration / n_attempts;
 
+        beg = std::chrono::high_resolution_clock::now();
+        for (int p = 0; p < n_attempts; p++) {
+            map<string, int> par_ngrams = computeParallelNgrams(corpus, j);
+        }
+        end = std::chrono::high_resolution_clock::now();
+        duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - beg).count();
+        cout << "Par time: " << duration / n_attempts << endl;
+        par_times[j - min_ngram_length] = duration / n_attempts;
+    }
     return 0;
 }
 
@@ -46,7 +59,7 @@ string readInput(const string& path) {
     return data;
 }
 
-map<string, int> computeSequentialNgrams(const string& data, int ngram_length, int start, int end) {
+map<string, int> computeSequentialNgrams(string data, int ngram_length, int start, int end) {
     map<string, int> ngrams;
     for (int i = start; i <= end - ngram_length + 1; i++) {
         string ngram = data.substr(i, ngram_length);
@@ -55,7 +68,7 @@ map<string, int> computeSequentialNgrams(const string& data, int ngram_length, i
     return ngrams;
 }
 
-map<string, int> computeParallelNgrams(const string& data, int ngram_length) {
+map<string, int> computeParallelNgrams(string data, int ngram_length) {
     map<string, int> ngrams;
     int n_threads = omp_get_max_threads();
 
