@@ -4,6 +4,8 @@
 #include <map>
 #include <omp.h>
 #include <chrono>
+#include "matplotlibcpp.h"
+namespace plt = matplotlibcpp;
 
 using namespace std;
 
