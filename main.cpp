@@ -5,6 +5,7 @@
 #include <omp.h>
 #include <chrono>
 #include "matplotlibcpp.h"
+#include <vector>
 namespace plt = matplotlibcpp;
 
 using namespace std;
@@ -22,10 +23,9 @@ int main() {
 
     int min_ngram_length = 2;
     int max_ngram_length = 8;
-    int n_attempts = 10;
+    int n_attempts = 1;
 
-    long long int seq_times[max_ngram_length - min_ngram_length + 1];
-    long long int par_times[max_ngram_length - min_ngram_length + 1];
+    vector<long long int> seq_times, par_times;
 
     for (int j = min_ngram_length; j <= max_ngram_length; j++) {
         cout << endl << "Length: " << j << endl;
@@ -36,7 +36,7 @@ int main() {
         end = std::chrono::high_resolution_clock::now();
         duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - beg).count();
         cout << "Seq time: " << duration / n_attempts << endl;
-        seq_times[j - min_ngram_length] = duration / n_attempts;
+        seq_times.push_back(duration / n_attempts);
 
         beg = std::chrono::high_resolution_clock::now();
         for (int p = 0; p < n_attempts; p++) {
@@ -45,8 +45,13 @@ int main() {
         end = std::chrono::high_resolution_clock::now();
         duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - beg).count();
         cout << "Par time: " << duration / n_attempts << endl;
-        par_times[j - min_ngram_length] = duration / n_attempts;
+        par_times.push_back(duration / n_attempts);
     }
+
+
+    plt::plot(seq_times);
+    plt::save("../minimal.png");
+
     return 0;
 }
 
