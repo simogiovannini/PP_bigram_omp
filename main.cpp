@@ -13,7 +13,7 @@ using namespace std;
 string readInput(const string& path);
 int contains(const string& str, char targetChar);
 map<string, int> computeSequentialNgrams(string data, int ngram_length, int start, int end);
-map<string, int> computeParallelNgrams(string data, int ngram_length);
+map<string, int> computeParallelNgrams(string data, int ngram_length, int n_threads);
 
 int main() {
     string corpus = readInput("../corpus.txt");
@@ -25,6 +25,7 @@ int main() {
     int min_ngram_length = 2;
     int max_ngram_length = 8;
     int n_attempts = 10;
+    int n_threads = 8;
 
     vector<long long int> seq_times, par_times;
     vector<int> ngram_lengths;
@@ -43,7 +44,7 @@ int main() {
 
         beg = std::chrono::high_resolution_clock::now();
         for (int p = 0; p < n_attempts; p++) {
-            map<string, int> par_ngrams = computeParallelNgrams(corpus, j);
+            map<string, int> par_ngrams = computeParallelNgrams(corpus, j, n_threads);
         }
         end = std::chrono::high_resolution_clock::now();
         duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - beg).count();
@@ -95,13 +96,12 @@ map<string, int> computeSequentialNgrams(string data, int ngram_length, int star
     return ngrams;
 }
 
-map<string, int> computeParallelNgrams(string data, int ngram_length) {
+map<string, int> computeParallelNgrams(string data, int ngram_length, int n_threads) {
     map<string, int> ngrams;
-    int n_threads = omp_get_max_threads();
 
     int batch_size = data.length() / n_threads;
 
-#pragma omp parallel default(none) shared(ngram_length, batch_size, data, ngrams)
+#pragma omp parallel num_threads(n_threads) default(none) shared(ngram_length, batch_size, data, ngrams)
     {
         int thread_id = omp_get_thread_num();
         int start = thread_id * batch_size;
