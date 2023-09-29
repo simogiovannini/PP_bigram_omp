@@ -11,6 +11,7 @@ namespace plt = matplotlibcpp;
 using namespace std;
 
 string readInput(const string& path);
+int contains(const string& str, char targetChar);
 map<string, int> computeSequentialNgrams(string data, int ngram_length, int start, int end);
 map<string, int> computeParallelNgrams(string data, int ngram_length);
 
@@ -52,7 +53,7 @@ int main() {
 
     plt::plot(ngram_lengths, seq_times);
     plt::plot(ngram_lengths, par_times);
-    plt::title("Execution times [in milliseconds]");
+    plt::title("Tempo di esecuzione [in millisecondi]");
     plt::save("../fig1.png");
 
     cout << endl;
@@ -75,11 +76,21 @@ string readInput(const string& path) {
     return data;
 }
 
+int contains(const string& str, char targetChar) {
+    int index = str.find(targetChar);
+    if (index != std::string::npos) return index;
+    else return -1;
+}
+
 map<string, int> computeSequentialNgrams(string data, int ngram_length, int start, int end) {
     map<string, int> ngrams;
     for (int i = start; i <= end - ngram_length + 1; i++) {
         string ngram = data.substr(i, ngram_length);
-        ngrams[ngram]++;
+        int space_index = contains(ngram, ' ');
+        if(space_index != -1) {
+            i += space_index;
+        }
+        else ngrams[ngram]++;
     }
     return ngrams;
 }
@@ -108,7 +119,11 @@ map<string, int> computeParallelNgrams(string data, int ngram_length) {
 
         for (int i = start; i <= end - ngram_length + 1; i++) {
             string ngram = data.substr(i, ngram_length);
-            local_ngrams[ngram]++;
+            int space_index = contains(ngram, ' ');
+            if(space_index != -1) {
+                i += space_index;
+            }
+            else local_ngrams[ngram]++;
         }
 
         for (auto const &pair: local_ngrams) {
